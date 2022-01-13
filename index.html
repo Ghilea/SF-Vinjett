@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gruppuppgift</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap');
+        
+        body {
+            /*background-image: linear-gradient(to left, #030412 0%, #0e1730 100%);*/
+            background-color: black;
+            font-family: 'Roboto Slab', serif;
+        }
+
+        .container {
+            width:70vw;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
+            gap: 1em;
+            opacity: 0;
+            margin:5% auto 0 auto;
+        }
+
+        h1 {
+            position: absolute;
+            top: 19%;
+            left: 0;
+            right: 0;
+            bottom: 20%;
+            color: white;
+            letter-spacing: 0.2rem;
+            font-size: 9vw;
+            mix-blend-mode: multiply;
+            z-index: 99;
+            background-color: black;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        #videoContainer {
+            overflow: hidden;
+            width: 36vw;
+            height: auto;
+            position: absolute;
+            top: 15%;
+        }
+
+        #videoContainer video {    
+            width: 100%;
+        }
+
+        #show {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 1em 2em;
+            padding: 3em;
+            max-width: 50em;
+            width:100%;
+            min-height:26em;
+            height:100%;
+            transition: all 2.8s ease-in-out;
+            overflow: hidden;
+            max-height: auto;
+        }
+
+        .movieInformation {
+            max-width: 30em;
+            width: 100%;
+            color: white;
+            animation: fadeIn 3s ease-in-out;
+        }
+
+        .movieInformation h2 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: 0.05rem;
+        }
+
+        .movieInformation h2 span{
+            margin: 0;
+            font-size: 1.3rem;
+            letter-spacing: 0.05rem;
+        }
+
+        .movieInformation h3 {
+            font-size: 1rem;
+            letter-spacing: 0.05rem;
+        }
+
+        .movieInformation p {
+            font-size: 0.85rem;
+            letter-spacing: 0.12rem;
+        }
+
+        .poster img {
+            width: 100%;
+            height: 8em;
+            border-top-left-radius: 0.3em;
+            border-top-right-radius: 0.3em;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.5);
+            transition: all .5s;
+        }
+
+        .poster img:hover {
+            cursor: pointer;
+            box-shadow: 0 2px 15px rgba(255,255,255,0.5);
+            opacity: 0.7;
+            transform: scale(1.1);
+        }
+
+        .poster img:hover ~ figcaption{
+            transform: scale(1.1);
+            transition: all .5s;
+        }
+
+        .poster img:active {
+            animation: clickEffect 3s ease-in-out;
+        }
+
+        #posterContainer {
+            width:70vw;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1em 1em;
+            background-image: linear-gradient(to left,  #670000 0%,  #260101 100%);
+            box-shadow: 0 0 15px 5px rgba(255,255,255,0.2);
+            border-radius: 0.5em;
+            padding: 2em;
+        }
+
+        figure {
+            margin: 0;
+            width: 5.5em;
+        }
+
+        figcaption {
+            color: white;
+            padding: 0.5em 0;
+            letter-spacing: 0.05rem;
+            text-align: center;
+            text-shadow: 2px 2px 15px rgba(0,0,0,1);
+        }
+
+        .movie {
+            width: 15em;
+            animation: fadeIn 5s ease-in-out;
+        }
+
+        .movie img {
+            width: 100%;
+            border-top-left-radius: 0.3em;
+            border-top-right-radius: 0.3em;
+            box-shadow: 0 2px 15px rgba(255,255,255,0.5);
+        }
+
+        #curtainContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom:0;
+            overflow: hidden;
+        }
+
+        #curtainBtn {
+            width: 100%;
+            height: 100vh;
+            z-index: 2;
+        }
+
+        .curtainPanel {
+            position: absolute;
+            width: 10%;
+            height: 120vh;
+            background: repeating-linear-gradient(to right, #4c0c14 4vw, #6e0018 8vw, #301116 10vw);
+            background-size: 100% 100%;
+            float: left;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        input[type="radio"]{
+            display:none;
+        }
+        
+        #curtainBtn:checked ~ .sfContainer .star{
+            animation: fadeOut 0.1s ease-in-out 2.9s forwards, flicker 0.5s infinite;  
+        }
+
+        #curtainBtn:checked ~ #curtainContainer .curtainPanel{
+            cursor: default;
+        }
+
+        #curtainBtn:checked ~ #curtainContainer .curtainPanel:nth-child(1n+1){
+            animation: panelLeft 5.7s ease-in-out forwards;
+        }
+
+        #curtainBtn:checked ~ #curtainContainer .curtainPanel:nth-child(1n+6){
+            animation: panelRight 5.7s ease-in-out forwards;
+        }
+
+        #curtainBtn:checked ~ .sf {
+            animation: fadeIn 1s ease-in-out 8s forwards, fadeOut 1s ease-out 14.7s forwards, glowEffect 4s ease-in-out 8s forwards, lightEffect 0.7s ease-in-out 13.3s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .sline {
+            animation: blineUp 3s ease-in forwards, fadeOut 0.1s ease-out 7.9s forwards, flickerSline 0.6s ease-in-out 3.1s infinite;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(1) {
+            animation: blineSideLeft 8s ease-out 3.1s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(2) {
+            animation: blineSideRight 8s ease-out 3.1s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(3) {
+            animation: blineSideLeft 8s ease-out 3.7s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(4) {
+            animation: blineSideRight 8s ease-out 3.7s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(5) {
+            animation: blineSideLeft 8s ease-out 4.3s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(6) {
+            animation: blineSideRight 8s ease-out 4.3s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(7) {
+            animation: blineSideLeft 8s ease-out 4.9s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(8) {
+            animation: blineSideRight 8s ease-out 4.9s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(9) {
+            animation: blineSideLeft 8s ease-out 5.5s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(10) {
+            animation: blineSideRight 8s ease-out 5.5s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(11) {
+            animation: blineSideLeft 8s ease-out 6.1s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(12) {
+            animation: blineSideRight 8s ease-out 6.1s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(13) {
+            animation: blineSideLeft 8s ease-out 6.7s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(14) {
+            animation: blineSideRight 8s ease-out 6.7s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(15) {
+            animation: blineSideLeft 8s ease-out 7.3s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(16) {
+            animation: blineSideRight 8s ease-out 7.3s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(17) {
+            animation: blineSideLeft 8s ease-out 7.9s forwards;
+        }
+
+        #curtainBtn:checked ~ .sfContainer .line:nth-child(18) {
+            animation: blineSideRight 8s ease-out 7.9s forwards;
+        }
+
+        #curtainBtn:checked ~ .container {
+            display:flex;
+            animation: fadeIn 5s ease-in 16s forwards;
+        }
+
+        .curtainPanel:nth-child(1){
+            left:0;
+            animation-delay: 0.1s;
+        }
+
+        .curtainPanel:nth-child(2){
+            left: 10%;
+            animation-delay: 0.2s;
+        }
+
+        .curtainPanel:nth-child(3){
+            left: 20%;
+            animation-delay: 0.3s;
+        }
+        
+        .curtainPanel:nth-child(4){
+            left: 30%;
+            animation-delay: 0.4s;
+        }
+
+        .curtainPanel:nth-child(5){
+            left: 40%;
+            animation-delay: 0.5s;
+            box-shadow: 10px 0 20px 1px rgba(255,255,255,0.2);
+        }
+
+        .curtainPanel:nth-child(6){
+            right:40%;
+            animation-delay: 0.6s;
+            box-shadow: -10px 0 20px 1px rgba(255,255,255,0.2);
+        }
+
+        .curtainPanel:nth-child(7){
+            right:30%;
+            animation-delay: 0.7s;
+        }
+
+        .curtainPanel:nth-child(8){
+            right:20%;
+            animation-delay: 0.8s;
+        }
+
+        .curtainPanel:nth-child(9){
+            right:10%;
+            animation-delay: 0.9s;
+        }
+
+        .curtainPanel:nth-child(10){
+            right:0;
+            animation-delay: 1s;
+        }
+
+        .sf{
+            position: fixed;
+            left:0;
+            top:0;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-image: url("https://upload.wikimedia.org/wikipedia/commons/c/c3/Svensk_Filmindustri_logo.png");
+            background-size: 30%;
+            width:100vw;
+            height: 100vh;
+            filter:drop-shadow(0 0 30px rgba(255,255,255, 1)) brightness(0) invert(1);
+            z-index: -2;
+            opacity: 0;
+        }
+
+        .sfContainer{
+            position: fixed;
+            left:0;
+            top:0;
+            width:100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .line {
+            position: absolute;
+            transform:translateX(50vw);
+            bottom:0;
+            width: 0.5em;
+            height: 100vh;
+            background-image: linear-gradient(to right, #0056b6, #003599, #001669);
+            z-index: -1;
+            border-top-left-radius: 5em;
+            border-top-right-radius: 5em;
+            box-shadow: 0 0 10px #0056b6;
+            opacity: 0;
+        }
+
+        .sline {
+            position: absolute;
+            transform:translateX(50vw);
+            bottom:0;
+            width: 0.5em;
+            height: 100vh;
+            max-height: 0;
+            background-image: linear-gradient(to right, #0056b6, #003599, #001669);
+            z-index: -1;
+            border-top-left-radius: 5em;
+            border-top-right-radius: 5em;
+            box-shadow: 0 0 10px #0056b6;
+        }
+
+        .star{
+            width: 8px;
+            height: 8px;
+            background-color:rgb(255,255,255);
+            border-radius: 30%;
+            opacity: 0.5;
+        }
+
+        @keyframes fadeInBg {
+            0%{
+                background-color: none;
+            }
+            100% {
+                background-image: linear-gradient(to left, #030412 0%, #0e1730 100%);
+            }
+        }
+
+        @keyframes flickerSline {
+            0% {
+                background-image: linear-gradient(to right, #0057bb, #5b94ff, #0030dc);
+                box-shadow: 0 0 10px white;
+            }
+
+            100% {
+                background-image: linear-gradient(to right, #0056b6, #003599, #001669);
+            }
+        }
+
+
+        @keyframes flicker {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 2px 50px 0px rgb(255, 255, 255);
+            }
+
+            20% {
+                transform: scale(1);
+                box-shadow: 0 2px 50px 5px rgb(255, 255, 255);
+            }
+
+            50% {
+                transform: scale(1);
+                box-shadow: 0 2px 50px 20px rgb(255, 255, 255);
+            }
+
+            75% {
+                transform: scale(0.4);
+                box-shadow: 0 2px 50px 5px rgb(255, 255, 255);
+            }
+
+            100% {
+                transform: scale(0.6);
+                box-shadow: 0 2px 50px 15px rgb(255, 255, 255);
+            }
+        }
+
+        @keyframes blineUp {
+            100% {
+                max-height: 100%;
+                border-radius: 0;
+            }
+        }
+
+        @keyframes blineSideLeft {
+            0% {
+                left:-1%;  
+            }
+
+            10% {
+                opacity: 1;                
+            }
+
+            100% {
+                left:-100%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes blineSideRight {
+            0% {
+                left:1%;  
+            }
+
+            10% {
+                opacity: 1;               
+            }
+
+            100% {
+                left:100%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes lightEffect {
+            0% {
+                filter:drop-shadow(0 0 10px rgba(255,255,255, 1) brightness(0) invert(1));
+            }
+
+            15% {
+                filter:drop-shadow(0 0 10px rgba(255,255,255, 0) brightness(0) invert(1));
+            }
+
+            30% {
+                filter:drop-shadow(0 0 10px rgba(255,255,255, 1));
+            }
+
+            45% {
+                filter:drop-shadow(0 0 10px rgba(255,255,255, 0));
+            }
+
+            60% {
+                filter:drop-shadow(0 0 10px rgba(255,255,255, 1));
+            }
+
+            75% {
+                filter:drop-shadow(0 0 10px rgba(255,255,255, 0));
+            }
+
+            100% {
+                filter:drop-shadow(0 0 10px rgba(255,255,255, 1));
+            }
+
+        }
+
+        @keyframes glowEffect {
+            40% {
+                transform: rotateY(0);
+            }
+
+            100% {
+                transform: rotateY(360deg);
+                filter:drop-shadow(0 0 35px rgba(255,255,255, 0));
+            }
+        }
+
+        @keyframes slide {
+            100% {
+                max-height: 55em;
+            }
+        }
+
+        @keyframes clickEffect {
+            0% {
+                transform: scale(1);
+            }
+
+            100% {
+                transform: scale(0.9);
+            }
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes panelLeft {
+            0% {
+                transform: translateX() rotate(0);
+            }
+
+            100% {
+                transform: translateX(-400%) rotate(15deg);
+            }
+        }
+
+        @keyframes panelRight {
+            0% {
+                transform: translateX() rotate(0);
+            }
+
+            100% {
+                transform: translateX(400%) rotate(-15deg);
+            }
+        }
+
+    </style>
+</head>
+<body>
+        <input type="radio" id="curtainBtn">
+        <label id="curtainContainer" for="curtainBtn">
+            <div class="curtainPanel"></div>
+            <div class="curtainPanel"></div>
+            <div class="curtainPanel"></div>
+            <div class="curtainPanel"></div>
+            <div class="curtainPanel"></div>
+            <div class="curtainPanel"></div>
+            <div class="curtainPanel"></div>
+            <div class="curtainPanel"></div>
+            <div class="curtainPanel"></div>
+            <div class="curtainPanel"></div>
+        </label>
+        <div class="sf"></div>
+        <div class="sfContainer">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="sline"><div class="star"></div></div>
+        </div>
+        <div class="container">
+            <div id="videoContainer">
+            <h1 id="topTitle">Filmer</h1>
+            <video autoplay loop muted>
+                <source src="./sounds/montage.mp4">
+            </video>
+            </div>
+                <div id="show"></div>
+                <div id="posterContainer"></div>
+            </div>
+
+    <script async>
+
+    const movieArray = [
+        {
+            'title' : 'Titanic',
+            'director' : 'James Cameron',
+            'year' : '1997',
+            'runtime' : '3t 14m',
+            'img' : './bilder/titanic.jpg',
+            'price' : '100kr',
+            'stars' : 'Leonardo DiCaprio, Kate Winslet',
+            'text' : '1912. Den unga Rose, hennes mor och hennes rike fästman Cal går ombord på Titanic. Konstnären Jack har vunnit sin tredjeklassbiljett på poker. Samma kväll tänker Rose hoppa över relingen, men Jack talar henne till rätta. Nästa dag anförtror sig den olyckliga Rose till Jack.'
+        },
+        {
+            'title' : 'Avatar',
+            'director' : 'James Cameron',
+            'year' : '2009',
+            'runtime' : '2t 42m',
+            'img' : './bilder/avatar.jpg',
+            'price' : '100kr',
+            'stars' : 'Sam Worthington, Zoe Saldaña',
+            'text' : 'Marinkårssoldaten Jake Sully kommer till planeten Pandora med ett mycket speciellt uppdrag. Han styr en avatar, en konstgjord kropp som ser exakt ut som Navi, planetens humanoida ursprungsbefolkning. De koloniserade människorna vill utnyttja planetens mineraltillgångar, vilket Navi kämpar mot. Sully skall infiltrera dem för att se om det finns en lösning på konflikten. Sully blir alltmer gripen av det naturfolk han skall undersöka och inser snart att det kanske är människorna som är det verkliga hotet i denna konflikt.'
+        },
+        {
+
+            'title' : 'My little pony: En ny generation',
+            'director' : 'Robert Cullen',
+            'year' : '2021',
+            'runtime' : '1t 30m',
+            'img' : './bilder/my-little-pony.jpg',
+            'price' : '500kr',
+            'stars' : 'Vanessa Hudgens, Kimiko Glenn',
+            'text' : 'Equestria är splittrat, men en klarögd hjälteponny tror att alla kan leva tillsammans i harmoni - och med hoven på hjärtat är hon beredd att bevisa det.'},
+        {
+            'title' : 'Home',
+            'director' : 'Tim Johnson',
+            'year' : '2015',
+            'runtime' : '1t 34m',
+            'img' : './bilder/home.jpg',
+            'price' : '200kr',
+            'stars' : 'Jim Parsons, Rihanna, Jennifer Lopez',
+            'text' : 'En fredlig grupp utomjordingar invaderar jorden och använder det som ett gömställe från sina fiender.'
+        },
+        {
+            'title' : 'Blade Runner',
+            'director' : 'Ridley Scott',
+            'year' : '1982',
+            'runtime' : '1h 57min',
+            'img' : './bilder/blade-runner.jpg',
+            'price' : '100kr',
+            'stars' : 'Harrison Ford, Rutger Hauer',
+            'text' : 'Året är 2019. Mänskligheten har skapat kloner som arbetar på rymdkolonier utanför jorden. Men efter ett blodigt myteri på en av kolonierna förbjuds användandet av kloner och de direktiv ges att de ska förstöras. När några av klonerna kapar ett rymdskepp och beger sig till jorden dyker Rick Deckard upp. Deckard tillhör en specialstyrka inom polisen, Blade runner, vars enda uppgift är att förstöra kloner.'
+        },
+        {
+            'title' : 'Oldboy',
+            'director' : 'Park Chan-wook',
+            'year' : '2003',
+            'runtime' : '2h',
+            'img' : './bilder/old-boy.jpg',
+            'price' : '100kr',
+            'stars' : 'Choi Min-sik, Yoo Ji-tae',
+            'text' : 'Efter att plötsligt och omotiverat ha kidnappats och hållits fången i ett rum av okända gärningsmän släpps Oh Dae-su lika oväntat fri 15 år senare. Traumatiserad och med sitt liv raserat börjar han smida planer på hämnd.'
+        },
+        { 
+            'title' : 'Breakfast at Tiffanys',
+            'director' : 'Blake Edwards',
+            'year' : '1961',
+            'runtime' : '1 t 30 min',
+            'img' : './bilder/breakfast-at-tiffanys.jpg',
+            'price' : '27kr',
+            'stars' : 'Audrey Hepburn, George Peppard',
+            'text' : 'A young New York socialite becomes interested in a young man who has moved into her apartment building, but her past threatens to get in the way.'
+        },
+        {  
+            'title' : 'Tenet',
+            'director' : 'Christopher Nolan',
+            'year' : '2020',
+            'runtime' : '2t 30m',
+            'img' : './bilder/tenet.jpg',
+            'price' : '299kr',
+            'stars' : 'Elizabeth Debicki, Robert Pattinson',
+            'text' : 'En CIA-agent får ett kryptiskt uppdrag och inser efterhand att han måste försöka förhindra att världen ska gå under.'
+        },
+        {
+            'title' : 'Wolf Of Wallstreet',
+            'director' : 'Martin Scorsese',
+            'year' : '2013',
+            'runtime' : '3t 14m',
+            'img' : './bilder/the-wolf-of-wall-street.jpg',
+            'price' : '100kr',
+            'stars' : 'Leonardo DiCaprio, Margot Robbie',
+            'text' : 'Börsmäklare Jordan Belforts går från den amerikanska drömmen till total girighet när han förvandlas från hederlig småhandlare till korrupt börshaj med öknamnet The Wolf Of Wall Street. Pengar, makt, kvinnor och droger.'
+        },
+        {
+            'title' : 'The Hangover',
+            'director' : 'Todd Phillips',
+            'year' : '2009',
+            'runtime' : '1h 40',
+            'img' : './bilder/hangover.jpg',
+            'price' : '299kr',
+            'stars' : '	Bradley Cooper, Ed Helms, Zach Galifianakis, Justin Bartha',
+            'text' : 'De planerade en oförglömlig svensexa i Las Vegas. Men dagen efter den stora kvällen minns ingen vad som hände. Varför är det en baby i deras hotellsvit? Vem har tagit in en tiger i badrummet? Och framförallt: var är brudgummen Doug?'
+        }
+    ];
+
+    const showMovie = document.getElementById('show');
+    const posterContainer = document.getElementById('posterContainer');
+    const curtainBtn = document.getElementById('curtainBtn');
+    
+    const introMp3 = './sounds/intro.mp3';
+    const clickMp3 = './sounds/click.mp3';
+
+    let introAudio = new Audio(introMp3);
+    let clickAudio = new Audio(clickMp3);
+
+    preloadSound();
+    introEffect();
+    addPosters();
+
+    /*******************/
+    /* functions       */
+    /*******************/
+    function addPosters(){
+        movieArray.forEach((element, index) => {
+            posterContainer.innerHTML += 
+            '<figure class="poster">'
+            + '<img onclick="show(' + index +')" src="' + element.img + '" title="'+ element.title +'" alt="' + element.title + '">'
+            + '<figcaption>' + element.title + '</figcaption>'
+            + '</figure>';
+        });
+    }
+
+    function preloadSound(){    
+        let soundArray = [introAudio, clickAudio];
+
+        soundArray.forEach(element => {
+            element.addEventListener('canplaythrough', function(){});
+        });
+    }
+
+    function introEffect(){
+        curtainBtn.addEventListener('change', function(){
+            if(this.checked){
+                introAudio.play();
+            }
+        })
+    }
+
+    function show(index){
+        clickAudio.play();
+        document.getElementById('videoContainer').style.animation = 'fadeOut 0.5s ease-in-out forwards';
+        document.body.style.animation = 'fadeInBg 1.5s ease-in-out forwards';
+
+        showMovie.innerHTML = 
+            '<figure class="movie">'
+            + '<img src="' + movieArray[index].img + '" title="'+ movieArray[index].title +'" alt="' + movieArray[index].title + '">'
+            + '<figcaption>Biljettpris: ' + movieArray[index].price + '</figcaption>'
+            + '</figure>'
+            
+            + '<div class="movieInformation">'
+            + '<h2>' + movieArray[index].title + ' <span>(' + movieArray[index].year + ')</span></h2>'
+            + '<h3>Speltid: ' + movieArray[index].runtime + '</h3>'
+            + '<h3>Regissör: ' + movieArray[index].director + '</h3>'
+            + '<h3>Skådespelare: ' + movieArray[index].stars + '</h3>'
+            + '<p>' + movieArray[index].text + '</p>'
+            + '</div>';
+    }
+
+    </script>
+    
+</body>
+</html>
